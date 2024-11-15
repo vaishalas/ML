@@ -61,3 +61,27 @@ y_pred = np.argmax(model.predict(test_data), axis=1)
 print("Classification Report:")
 print(classification_report(y_true, y_pred, target_names=list(test_data.class_indices.keys())))
 print(f"Overall Accuracy: {accuracy_score(y_true, y_pred):.4f}")
+def load_and_predict(img_path, model, class_indices):
+    # Load the image from the specified path
+    img = image.load_img(img_path, target_size=(64, 64))  # Resize to model's input size
+    plt.imshow(img)
+    plt.axis("off")
+    plt.show()
+
+    # Convert image to array and preprocess
+    img_array = image.img_to_array(img)
+    img_array = np.expand_dims(img_array, axis=0)  # Add batch dimension
+    img_array = img_array / 255.0  # Normalize the image
+
+    # Make a prediction
+    predictions = model.predict(img_array)
+    predicted_class = np.argmax(predictions, axis=1)[0]
+    class_labels = {v: k for k, v in class_indices.items()}  # Invert indices
+
+    print(f"Predicted gesture: {class_labels[predicted_class]}")
+    return class_labels[predicted_class]
+
+# Usage example
+img_path = '/path/to/your/image.jpg'  # Replace with the local path to your image
+predicted_gesture = load_and_predict(img_path, model, test_data.class_indices)
+print(f"The model predicts the gesture as: {predicted_gesture}")
